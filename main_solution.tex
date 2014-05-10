@@ -1,1 +1,112 @@
-\section{Main Structure}
+\secput{solution}{Range Coalescing}
+
+In this section we describe how an iterated predecessor query can be 
+satisfied cache-obliviously using $O(\log_{B+1} n + k/B)$ 
+memory transfers using a \defn{range coalescing} data structure.  
+We also describe how a range coalescing data structure is built 
+cache-obliviously from a set of sorted lists $L_1 \ldots L_k$ each of size $n$ 
+using only $O(nk/B)$ memory transfers with high probability.  
+
+%\subsection*{Structure}
+
+Let $H$ be a range coalescing data structure built from a set of $k$ $n$-length
+sorted lists $L_1 \ldots L_k$.  $H$ is composed of $n$ bins, each of size $O(k)$,
+which partition the space of possible query values using a sorted list of $n$ 
+splitters $S$, as depicted in \figref{range_coalescing}.  \figref{coalesced_bin}
+illustrates how a bin concatenates $k$ sequences of elements, each of which is a 
+subsequence of each constituent list from $\{L_1 \ldots L_k\}$.  
+The first element of the $i$th subsequence in the $j$th bin is the predecessor
+of the splitter $S_j$ in $L_i$ and is strictly smaller than it, a fact that we will 
+exploit to implicitly denote the beginning of each subsequence.  
+
+\begin{lemma}
+A range coalescing data structure $H$ built from a set of $k$ $n$-length
+sorted lists $L_1 \ldots L_k$ consumes $O(nk)$ space.
+\end{lemma}
+\begin{proof}
+The elements from all $k$ $n$-length lists $L_1 \ldots L_k$ are partitioned 
+evenly into $n$ bins.  In addition, each bin has exactly one element for each of 
+the $k$ lists which is smaller in value than the splitter for the bin.  Thus, each
+of the $n$ bins has $O(k)$ elements.
+\end{proof}
+
+
+\subsection*{Iterated predecessor queries}
+
+This section describes the process by which a range coalescing data structure
+answers iterated predecessor queries and demonstrates that the process consumes
+$O(\log_{B+1} n + k/B)$ memory transfers with high probability.  \figref{query}
+gives pseudocode for the procedure \proc{query}, which takes a range
+coalescing data structure $H$ and a query $q$ and returns an ordered list of results which
+correspond to the predecessors of $q$ for each constituent list in $\{ L_1 \ldots L_k \}$.
+
+\begin{figure}[t] 
+  \begin{codebox*}
+    \Procname{\proc{query}$(H,q)$} 
+    \li $\langle D, s \rangle \gets \proc{vEB}(\attrib{H}{S},q)$ \lilabel{find_splitter}
+    \li $j \gets 1$
+    \li \For $i \gets 1$ \To $\attrib{D}{\id{size}} - 1$ \Do
+    \li   \If $D_i \leq q$ \Do
+    \li     $\id{output}_j \gets D_i$
+          \End
+    \li   \If $D_{i+1} < s$ \Do
+    \li     $j \gets j + 1$
+          \End
+        \End
+    \li \Return $\id{output}$
+  \end{codebox*}
+\caption{Pseudocode of the \proc{query} method for a range coalescing data
+structure $H$.  $H$ contains a sorted array $S$ of splitters organized using
+a van Emde Boas layout~\cite{BenderDeFa00}.  The function \proc{vEB} returns 
+a bin $D$, organized as an array, and a splitter $s$, which is the predecessor 
+of $q$ in $S$.  The bin $D$ is walked in a linear fashion, overwriting potential
+predecessors in the $\id{output}$ array and incrementing the output position whenever
+the subsequence of the next list begins.  The $j$th subsequence begins with the
+one and only element from $L_j$ that is smaller than the splitter $s$ and each
+bin is appended with $-\infty$ to handle the boundary condition when $D_{i+1}$ is
+compared with the splitter $s$. }
+\label{fig:query} 
+\end{figure}
+
+While it may be that the function \proc{query} is correct by inspection, we leave
+nothing to chance and prove it here.
+
+\begin{lemma}
+Given a range coalescing data structure
+$H$ and a query value $q \in \mathbb{R}$, the function \proc{query($H$,$q$)} 
+returns the correct answer.
+\end{lemma}
+\begin{proof}
+Consider the $j$th bin, with corresponding splitter $S_j$, which is used to satisfy
+all queries $q \in [S_j, S_{j+1})$.  By construction, the $j$th bin contains all
+elements $\{q \in \cup_{i=1}^{k} L_i$ s.t. $q \in [S_j, S_{j+1}) \}$ in addition to 
+the predecessor of $S_j$ from each list in $\{ L_1 \ldots L_k \}$.  
+Thus, the $j$th bin contains the $k$ correct
+answers --- the predecessors of $q$ in each constituent list in $\{ L_1 \ldots L_k \}$.  
+We also see that each subsequence has exactly one element that is less
+than the splitter $S_j$, which allows us to know which subsequence we are in during
+the course of the scan.  Furthermore, since the subsequences are stored in sorted
+order, we know that the predecessor results are the largest elements less than or
+equal to $q$ in each subsequence.
+\end{proof}
+
+Now we bound the number of memory transfers incurred by \proc{query} by walking 
+through the pseudocode in \figref{query}.
+
+\begin{theorem}
+An iterated predecessor query \proc{query}$(H,q)$ on a range coalescing data 
+structure $H$ built from a set of $k$ $n$-length sorted lists $L_1 \ldots L_k$ 
+incurs $O(\log_{B+1} n + k/B)$ memory transfers on a processor with a cache 
+size of $M = \Omega(B)$ blocks.
+\end{theorem}
+\begin{proof}
+We use the cache-oblivious search tree structure described by Bender, 
+Demaine and Farach-Colton~\cite{BenderDeFa00} on \liref{find_splitter} of 
+\figref{query} to find the bin corresponding to the predecessor in the 
+sorted $n$-length splitter list $S$ using $O(\log_{B+1}n)$ memory transfers.
+After we find the splitter and the corresponding bin $D$, we merely scan through
+$D$ once and write out the answers in a continuous stream to the array $\id{output}$.
+Thus, we incur a read stream and a write stream, each of which is $O(k)$ elements
+and $O(k/B)$ memory transfers.
+\end{proof}
+

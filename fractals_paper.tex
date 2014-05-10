@@ -1,9 +1,33 @@
 \documentclass[twocolumn]{article}
 \usepackage{times}
-\usepackage{titlesec}
-\titlelabel{\thetitle.\quad}
+%\usepackage{titlesec}
+\usepackage{clrscode4e}
+\usepackage{supertech}
+
+%\titlelabel{\thetitle.\quad}
 
 \begin{document}
+
+
+\title{Cache-oblivious Iterated Predecessor Queries via Range Coalescing}
+
+\author{\large Vineet Gopal\hspace*{0.5cm}\\
+William Hasenplaugh\hspace*{0.5cm}\\
+ \\
+6.851 - Advanced Data Structures\\
+Final Project}
+\date{\today}
+
+%\numberofauthors{1}
+
+%\author{%
+%R\aufnt  Vineet Gopal\hspace*{0.5cm} 
+%        William Hasenplaugh\\[6pt]
+%    \affaddr{6.851 - Advanced Data Structures}\\
+%    \affaddr{Final Project}
+%}
+
+\maketitle
 
 \input{abstract.tex}
 \input{intro.tex}
@@ -11,7 +35,11 @@
 \input{tools.tex}
 \input{other_solutions.tex}
 \input{main_solution.tex}
+\input{preprocessing.tex}
 \input{results.tex}
 \input{conclusion.tex}
+
+\bibliographystyle{acm}
+\small\bibliography{allpapers}
 
 \end{document}
