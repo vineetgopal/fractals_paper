@@ -1,0 +1,31 @@
+\subsection*{Preprocessing suboptimally}
+
+We give a trivial preprocessing which uses a $k$-funnel to merge all lists
+together and subsample every $k$th element.  
+
+Show that we can place the elements group-wise in the bins in $O(nk/B)$ transfers
+using a Z-order traversal.  Point out that this is asymptotically faster than
+merging the $k$ lists.
+
+\subsection*{Finding splitters for small $k$}
+
+$k < \lg^2 n$
+
+In this section, sample every element with probability $1/k$ and we just subdivide any bins
+with more than $2(1+\epsilon)k$ elements with a cache-oblivious select algorithm.
+The total number of memory transfers is $O(N/B)$ whp, which we get through a Hoeffding
+bound.
+
+Show that the number of splitters is $O(n)$ - Chernoff.
+
+\subsection*{Finding splitters for large $k$}
+
+$k \geq \lg ^2 n$
+
+In this section, we use sample sort (randomly select with probability $1/\lg k$ and
+then rake exactly $N/k$ evenly spaced samples) and $k$ is large enough that we don't have
+to subdivide the bins, yet still get $O(k)$-sized (actually, at most 
+$2(1+\epsilon)k$ elements) bins whp.  
+
+
+
