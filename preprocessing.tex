@@ -43,6 +43,15 @@ the 2D space spanned by the cross-product of bin number and list number.
 SNARF: optionally include a graphic of z-order, labeled with bin number, list number
 and depicting that we have $ac$ blocks in cache to handle a $c$ by $c$ space.
 
+\begin{figure}[h]
+%\begin{center}
+\includegraphics[scale=.35]{bin-construction.pdf}
+%\end{center}
+\caption{}
+\label{fig:range_coalescing} 
+\end{figure}
+
+
 \begin{theorem}
 Given a sorted list of $O(n)$ splitters $S$ and $k$ sorted $n$-length lists 
 $L_1 \ldots L_k$, the bins for a range coalescing data structure can be constructed
@@ -50,14 +59,16 @@ deterministically and cache-obliviously using $O(nk/B)$ memory transfers.
 \end{theorem}
 
 \begin{proof}
-Consider a $2^r$ by $2^r$ naturally aligned region \footnote{A naturally aligned region
+Consider a $2^r$ by $2^r$ naturally aligned region in the iteration space of the
+cross product of bin number and list number\footnote{A naturally aligned region
 of size $c$ by $c$ is one which begins with some indices $i \equiv 1 \pmod{c}$ 
 in one dimension and $j \equiv 1 \pmod{c}$ in the other.}.  
-The cache need only keep the ''head'' of each of the $2^r$ constituent
-lists $L_{i2^r + 1} \ldots L_{(i+1)2^r}$ and the head of the $2^r$ bins 
-$D_{j2^r + 1} \ldots D_{(j+1)2^r}$. The ''head'' of a list is the current location
-in the list as the elements are being transferred to various bins and the list
-is streamed linearly.  For the head of each list, there can be as many as
+The cache need only keep the head of each of the $2^r$ constituent
+lists $L_{i2^r + 1} \ldots L_{(i+1)2^r}$ for some $i$ and the head of the $2^r$ bins 
+$D_{j2^r + 1} \ldots D_{(j+1)2^r}$ for some $j$. 
+The ''head'' of a list is the current location
+in the list as the list is streamed linearly to transfer the elements to various bins.  
+For the head of each list, there can be as many as
 two non-full memory tranfers (ie. not all of the elements on the cache block were
 written or read).  Consider the largest $r$ for which these $2 \cdot 2^r$ list heads
 fit in cache, so that $a2^r = M$ for some constant $a$.  In total, there will be 
