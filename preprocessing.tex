@@ -17,7 +17,7 @@ In this section, we show how to find an $n$-length sorted splitter array $S$, su
 elements from $\mathcal{L} = \cup_{i=1}^{k}L_i$ fall in each range 
 $[S_j,S_{j+1})$ $\forall j$.  If we assume that all elements in $\mathcal{L}$ are 
 unique, we can merely merge all the elements and take every $k$th element in the
-merged list as the splitters.  \footnote{We can extend the value of each element with the
+merged list as the splitters.\footnote{We can extend the value of each element with the
 list number in order to make them unique, since the elements from any particular
 list $L_i$ are unique.  Note that if each list contained a value $l$ and the
 value $l$ from
@@ -38,16 +38,20 @@ If we were to merely build each of the $n$ bins in sequence, each of which could
 incur as many as $2k$ memory transfers since $k$ may be larger than $M$, we could
 incur as many as $O(nk)$ memory transfers overall.  This is unacceptable.  
 Instead, we will build the bins using a $Z$-order traversal~\cite{Morton66} of 
-the 2D space spanned by the cross-product of bin number and list number.
-
-SNARF: optionally include a graphic of z-order, labeled with bin number, list number
-and depicting that we have $ac$ blocks in cache to handle a $c$ by $c$ space.
+the 2D space spanned by the cross-product of bin number and list number, notated
+as the bin number $\times$ list number iteration space.
 
 \begin{figure}[h]
 %\begin{center}
 \includegraphics[scale=.35]{bin-construction.pdf}
 %\end{center}
-\caption{}
+\caption{Example $2^r$ by $2^r$ (for $r=3$) region of a $Z$-order traversal of 
+the bin number $\times$ list number iteration space.  During the course of the
+execution of this example region there are $8$ lists and $8$ 
+bins active.  The blue regions represent cache blocks which
+are partially read (lists $L_9 \ldots L_{16}$) and partially written 
+(bins $D_{25} \ldots D_{32}$).  The orange blocks are those which are fully read or 
+written, respectively.}
 \label{fig:range_coalescing} 
 \end{figure}
 
@@ -59,10 +63,11 @@ deterministically and cache-obliviously using $O(nk/B)$ memory transfers.
 \end{theorem}
 
 \begin{proof}
-Consider a $2^r$ by $2^r$ naturally aligned region in the iteration space of the
-cross product of bin number and list number\footnote{A naturally aligned region
+Consider a $2^r$ by $2^r$ naturally aligned region in the bin number $\times$ list
+number iteration space, like the one depicted in 
+\figref{range_coalescing}.\footnote{A naturally aligned region
 of size $c$ by $c$ is one which begins with some indices $i \equiv 1 \pmod{c}$ 
-in one dimension and $j \equiv 1 \pmod{c}$ in the other.}.  
+in one dimension and $j \equiv 1 \pmod{c}$ in the other.}  
 The cache need only keep the head of each of the $2^r$ constituent
 lists $L_{i2^r + 1} \ldots L_{(i+1)2^r}$ for some $i$ and the head of the $2^r$ bins 
 $D_{j2^r + 1} \ldots D_{(j+1)2^r}$ for some $j$. 
@@ -81,14 +86,94 @@ $nk/B$ full memory transfers.
 
 \subsection*{Finding splitters for small $k$}
 
-$k < \lg^2 n$
+In this section, we show how to find ''splitters'' which are representative elements
+which partition all of the elements into ''bins'', each of which stores the answers to any
+query which falls in the range of values between the associated splitter and the
+splitter for the next bin of larger value range.
+When $k$ is less than $\lg^2 n$, we can randomly select elements to be splitters
+with probability $1/k$ and subdivide bins that are too large, potentially generating
+extra splitters, while generating $O(nk/B)$ memory transfers with high probability.
+\footnote{In this context, 'with high probability' means with probability greater
+than $1-1/N^c$ where $N$ is the total number of elements in the problem and $c > 1$
+is some constant.} First, we establish two straightforward yet useful lemmas.
 
-In this section, sample every element with probability $1/k$ and we just subdivide any bins
-with more than $2(1+\epsilon)k$ elements with a cache-oblivious select algorithm.
-The total number of memory transfers is $O(N/B)$ whp, which we get through a Hoeffding
-bound.
+\begin{lemma}
+  Consider a coin with heads probability $1/k$.  In $nk$ flips we will see
+  between $n/2$ and $2n$ heads with probability at least $1-1/N^c$ for some $c>1$
+  and $N=nk$.
+  \label{lem:number_of_flips}
+\end{lemma}
+\begin{proof}
+  The proof follows from an application of Hoeffding's inequality, for sufficiently
+  large $n$ and the assumption that $k < \lg ^2 n$.
+\end{proof}
 
-Show that the number of splitters is $O(n)$ - Chernoff.
+\begin{lemma}
+  The largest number of elements with value between two splitters selected randomly 
+  with probability $1/k$ is $(1+\epsilon)k\lg N$ with probability at least 
+  $1 - 1/N^\epsilon$ for any $\epsilon > 0$, where $N=nk$.
+  \label{lem:max_R}
+\end{lemma}
+\begin{proof}
+  We can think of a bin as being created by successive coin flips with probability
+  of heads equal to $1/k$: every time tails comes up, the bin grows by one.  Thus,
+  the probability that a bin is of a particular size $R$ is at most $(1-1/k)^R / k$.
+  Summing from $R=R'$ to $\infty$, we can bound the probability that a particular
+  bin has size at least $R'$: $\sum_{R=R'}^{\infty}(1-1/k)^R/k = (1-1/k)^{R'}$.
+  Letting $R'=(1+\epsilon)k\lg N$ and taking the union bound across at most $nk$
+  different bins, the proof follows.
+\end{proof}
+
+Consider the process of splitting a bin which exceeds $2k$ elements.  We use 
+$\floor{R/2k}$ applications of a cache-oblivious selection 
+algorithm~\cite{FrigoLePr99} to subdivide large bins of size $R$ into bins of 
+size at most $2k$ elements using $O(\floor{R/2k} R/B)$ memory transfers.\footnote{For
+convenience, we assume $R>B$.  There is no need to make the bins smaller than $B$
+elements, since processing a bin incurs at least one memory reference.}
+
+\begin{theorem}
+  Let $N=nk$.  The total number of memory transfers $S$ required to subdivide all $m$ bins to be less
+  than $2k$ elements each is $O(N/B)$, assuming that the largest bin is at most 
+  $(1+\epsilon)k\lg N$ elements and $n/2 \leq m \leq 2n$.
+\end{theorem}
+\begin{proof}
+  Let $x_i$ be the number of memory transfers incurred by the $i$th bin and
+  thus $S=\sum_{i=1}^{m}X_i$.  Then, we have 
+  \begin{align*}
+    E[x_i] & \leq a \sum_{R=0}^{\infty} \frac{1}{k}\paren{1-\frac{1}{k}}^R \floor{\frac{R}{2k}} \frac{R}{B}\\
+    & \leq a \sum_{R=0}^{\infty} \paren{1-\frac{1}{k}}^R \frac{R^2}{2k^2B}\\
+    & \leq a\frac{k}{B}\\
+  \end{align*}
+  for some constant $a>0$.
+  Also, we see that
+  \begin{align*}
+    x_i &\leq \floor{\frac{(1+\epsilon)k\lg N}{2k}}\frac{(1+\epsilon)k\lg N}{B}\\
+    &\leq \frac{k}{2B}(1+\epsilon)^2 \lg ^2 N \\
+  \end{align*}
+  for all $i$.  Let $t = \paren{k/2B}(1+\epsilon)^2 \lg ^2 N$.  
+  Thus each random variable in $\{ x_1 \ldots x_m \}$ has support
+  in the range $[0, t]$.
+  A Hoeffding bound on $S$ gives us
+  \begin{align*}
+    %\prob{S - E[S] \geq E[S]} & \leq \exp \paren{ -\frac{2\paren{ am\frac{k}{B}}^2}{m\paren{\frac{k}{2B}\paren{1+\epsilon}^2\lg^2 N}^2}}\\
+    \prob{S - E[S] \geq t \sqrt{\epsilon m \lg N}} & \leq \exp \paren{-2\frac{\epsilon \lg N m t^2}{mt^2}}\\
+    & \leq \exp \paren{-2\epsilon \lg N}\\
+    & \leq N^{-\epsilon}.\\
+  \end{align*}
+  For sufficiently large $N$, $S$ is $O(N/B)$ with high probability.
+\end{proof}
+
+We need to verify that the process of subdivision does not unduly increase the number
+of bins.
+
+\begin{lemma}
+After subdivision, $O(n)$ bins will exist.
+\end{lemma}
+\begin{proof}
+Initially, there are $O(n)$ splitters with high probability by \lemref{number_of_flips}.
+The process of subdividing bins generates bins with size at least $k$, thus we
+can create at most $N/k = n$ extra bins through subdivision.
+\end{proof}
 
 \subsection*{Finding splitters for large $k$}
 
