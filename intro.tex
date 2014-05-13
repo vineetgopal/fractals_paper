@@ -12,19 +12,37 @@ linear preprocessing time and linear space via their technique \defn{fractional 
 In this project, we will demonstrate that the iterated predecessor query problem
 can be solved using a technique called \defn{range coalescing} in $O(\lg n + k)$ time.
 Range coalescing is \defn{cache-oblivious}~\cite{FrigoLePr99}, using only 
-$O(\log_{B+1} n + k/B)$ memory transfers to satisfy iterated predecessor
-queries.\footnote{Throughout this paper we will use the notation $\lg n$ to mean
-$\log_2 n$.}  Furthermore, range coalescing requires
+$O(\log_{B+1} n + k/B)$ memory transfers.\footnote{Throughout this paper we will 
+use the notation $\lg n$ to mean $\log_2 n$.}  Furthermore, range coalescing requires
 only linear space and the preprocessing takes linear time and $O(kn/B)$ memory
 transfers.
 
-Broad strokes of query with sweet graphic showing how the ranges are coalesced
+The essence of range coalescing, as the name suggests, is to coalesce ranges of 
+the query space into $n$ ''bins'', each of which could generate $O(k)$ different results.
+\figref{range_coalescing} illustrates how the smallest element in each bin has 
+is the ''splitter'' for the bin, so named because they collectively ''split'' all
+of the elements into the bins.  In addition,
+the predecessor of the splitter from each list is included in order to
+service predecessor requests which are smaller in value than the smallest element
+in the bin from each list.  \figref{coalesced_bin} gives an example of how the data
+in a bin is stored.  The elements from each list are stored in sorted subsequences of
+varying lengths, but of total length $O(k)$. Each bin stores $O(k)$ different 
+values and thus the total data structure is linear space.
+
+SNARF: walk through high-level query
 
 \begin{figure}[h]
 %\begin{center}
 \includegraphics[scale=.3]{cache-oblivious-fractional-cascading-a.pdf}
 %\end{center}
-\caption{}
+\caption{Range coalescing data structure for the iterated predecessor problem with
+the value of the element on the $x$-axis and each row representing a list in 
+$\{ L_1 \ldots L_k \}$.
+Each vertical line delineates the $O(k)$ elements in each bin.  The elements with a heavy
+black border are the splitters for each bin --- the smallest item in the bin is
+the splitter.  An example bin is highlighted by the blue vertical bar.  The elements
+to the left of the bar with rightward arrows are the predecessors of the splitter
+from the blue bin in each list.}
 \label{fig:range_coalescing} 
 \end{figure}
 
@@ -32,10 +50,28 @@ Broad strokes of query with sweet graphic showing how the ranges are coalesced
 %\begin{center}
 \includegraphics[scale=.33333]{cache-oblivious-fractional-cascading-c.pdf}
 %\end{center}
-\caption{}
+\caption{An example of how a bin is constructed in a range coalescing data
+structure.  The elements that fall in the range of the blue bar and the predecessor
+of the splitter (with heavy black border) from each list is represented in the bin.
+In particular, the subsequences of those elements from each list are stored together
+and concatenated so that the subsequence from $L_1$ comes first and so on until the
+subsequence from $L_k$.}
 \label{fig:coalesced_bin} 
 \end{figure}
 
-Terminology (define $M$, $B$ etc.)
+Throughout this paper we will let $M$ be the number of cache blocks of size $B$
+on a hypothetical external memory machine.  We will consider solutions to the iterated
+predecessor problem, in which we are given $k$ $n$-length lists $L_1 \ldots L_k$ and
+we preprocess them to improve the query time.
+
+In \secref{cacheoblivious} we discuss some simple known results from the study of
+cache-oblivious algorithms and data structures which are useful in subsequent analysis.
+\secref{simple} gives an overview of solutions to the iterated predecessor problem
+which are not cache-oblivious, but nonetheless serve as a reasonable baseline for
+our work.  We present range coalescing in \secref{solution} and show that they
+answer queries cache-obliviously using $O(\log_{B+1} n + k/B)$ memory transfers.
+\secref{preprocessing} demonstrates that the preprocessing for a range coalescing
+data structure requires only $O(nk/B)$ with high probability.  SNARF: finish section.
+
 
 Outline of sections
