@@ -7,9 +7,10 @@ First, we give a suboptimal deterministic strategy for finding the splitters
 --- the values that partition the query space such that each partition has $O(k)$ 
 elements from the constituent lists in $\{ L_1 \ldots L_k \}$.  Second, we 
 demonstrate that the elements from each list can be assembled in the bin corresponding
-to each splitter using $O(nk / B)$ memory transfers.  Finally, we give two randomized
-algorithm for finding the splitters when $k < \lg^2 n$ and $k \geq \lg^ n$, 
-respectively, each of which incurs $O(nk/B)$ memory transfers.  
+to each splitter using $O(N / B)$ memory transfers, for $N=nk$.  
+Finally, we give two randomized algorithm for finding the splitters when 
+$k < \lg^2 n$ and $k \geq \lg^ n$, 
+respectively, each of which incurs $O(N/B)$ memory transfers.  
 
 \subsection*{Preprocessing suboptimally}
 
@@ -25,8 +26,8 @@ the $L_i$ was chosen as the $j$th splitter $S_j$, we do not compromise the corre
 query, since the next smaller value than $S_j$ from each list in $\{ L_1 \ldots L_k\}$ is 
 contained in the $j$th bin.} We can use a cache-oblivious 
 $k$-merger~\cite{FrigoLePr99} to merge the elements using 
-$O((nk/B) \log_{M/B} (k/B) + k)$ memory transfers if $k \leq \sqrt[3]{n}$ and
-$O((nk/B) \log_{M/B} (nk/B))$ memory transfers otherwise.
+$O((N/B) \log_{M/B} (k/B) + k)$ memory transfers if $k \leq \sqrt[3]{n}$ and
+$O((N/B) \log_{M/B} (N/B))$ memory transfers otherwise.
 
 
 
@@ -92,15 +93,14 @@ query which falls in the range of values between the associated splitter and the
 splitter for the next bin of larger value range.
 When $k$ is less than $\lg^2 n$, we can randomly select elements to be splitters
 with probability $1/k$ and subdivide bins that are too large, potentially generating
-extra splitters, while generating $O(nk/B)$ memory transfers with high probability.
-\footnote{In this context, 'with high probability' means with probability greater
+extra splitters, while generating $O(N/B)$ memory transfers with high
+probability, where $N=nk$.\footnote{In this context, 'with high probability' means with probability greater
 than $1-1/N^c$ where $N$ is the total number of elements in the problem and $c > 1$
 is some constant.} First, we establish two straightforward yet useful lemmas.
 
 \begin{lemma}
   Consider a coin with heads probability $1/k$.  In $nk$ flips we will see
-  between $n/2$ and $2n$ heads with probability at least $1-1/N^c$ for some $c>1$
-  and $N=nk$.
+  between $n/2$ and $2n$ heads with probability at least $1-1/N^c$ for some $c>1$.
   \label{lem:number_of_flips}
 \end{lemma}
 \begin{proof}
@@ -111,7 +111,7 @@ is some constant.} First, we establish two straightforward yet useful lemmas.
 \begin{lemma}
   The largest number of elements with value between two splitters selected randomly 
   with probability $1/k$ is $(1+\epsilon)k\lg N$ with probability at least 
-  $1 - 1/N^\epsilon$ for any $\epsilon > 0$, where $N=nk$.
+  $1 - 1/N^\epsilon$ for any $\epsilon > 0$.
   \label{lem:max_R}
 \end{lemma}
 \begin{proof}
@@ -120,37 +120,38 @@ is some constant.} First, we establish two straightforward yet useful lemmas.
   the probability that a bin is of a particular size $R$ is at most $(1-1/k)^R / k$.
   Summing from $R=R'$ to $\infty$, we can bound the probability that a particular
   bin has size at least $R'$: $\sum_{R=R'}^{\infty}(1-1/k)^R/k = (1-1/k)^{R'}$.
-  Letting $R'=(1+\epsilon)k\lg N$ and taking the union bound across at most $nk$
+  Letting $R'=(1+\epsilon)k\lg N$ and taking the union bound across at most $N$
   different bins, the proof follows.
 \end{proof}
 
-Consider the process of splitting a bin which exceeds $2k$ elements.  We use 
-$\floor{R/2k}$ applications of a cache-oblivious selection 
+Consider the process of splitting a bin which exceeds $2(1+\epsilon)k$ elements.  We use 
+$\floor{R/2(1+\epsilon)k}$ applications of a cache-oblivious selection 
 algorithm~\cite{FrigoLePr99} to subdivide large bins of size $R$ into bins of 
-size at most $2k$ elements using $O(\floor{R/2k} R/B)$ memory transfers.\footnote{For
+size at most $2(1+\epsilon)k$ elements using $O(\floor{R/2(1+\epsilon)k} R/B)$ 
+memory transfers.\footnote{For
 convenience, we assume $R>B$.  There is no need to make the bins smaller than $B$
 elements, since processing a bin incurs at least one memory reference.}
 
 \begin{theorem}
   Let $N=nk$.  The total number of memory transfers $S$ required to subdivide all $m$ bins to be less
-  than $2k$ elements each is $O(N/B)$, assuming that the largest bin is at most 
+  than $2(1+\epsilon)k$ elements each is $O(N/B)$, assuming that the largest bin is at most 
   $(1+\epsilon)k\lg N$ elements and $n/2 \leq m \leq 2n$.
 \end{theorem}
 \begin{proof}
   Let $x_i$ be the number of memory transfers incurred by the $i$th bin and
   thus $S=\sum_{i=1}^{m}X_i$.  Then, we have 
   \begin{align*}
-    E[x_i] & \leq a \sum_{R=0}^{\infty} \frac{1}{k}\paren{1-\frac{1}{k}}^R \floor{\frac{R}{2k}} \frac{R}{B}\\
-    & \leq a \sum_{R=0}^{\infty} \paren{1-\frac{1}{k}}^R \frac{R^2}{2k^2B}\\
+    E[x_i] & \leq a \sum_{R=0}^{\infty} \frac{1}{k}\paren{1-\frac{1}{k}}^R \floor{\frac{R}{2(1+\epsilon)k}} \frac{R}{B}\\
+    & \leq a \sum_{R=0}^{\infty} \paren{1-\frac{1}{k}}^R \frac{R^2}{2(1+\epsilon)k^2B}\\
     & \leq a\frac{k}{B}\\
   \end{align*}
   for some constant $a>0$.
   Also, we see that
   \begin{align*}
-    x_i &\leq \floor{\frac{(1+\epsilon)k\lg N}{2k}}\frac{(1+\epsilon)k\lg N}{B}\\
-    &\leq \frac{k}{2B}(1+\epsilon)^2 \lg ^2 N \\
+    x_i &\leq \floor{\frac{(1+\epsilon)k\lg N}{2(1+\epsilon)k}}\frac{(1+\epsilon)k\lg N}{B}\\
+    &\leq \frac{k}{2B}(1+\epsilon) \lg ^2 N \\
   \end{align*}
-  for all $i$.  Let $t = \paren{k/2B}(1+\epsilon)^2 \lg ^2 N$.  
+  for all $i$.  Let $t = \paren{k/2B}(1+\epsilon) \lg ^2 N$.  
   Thus each random variable in $\{ x_1 \ldots x_m \}$ has support
   in the range $[0, t]$.
   A Hoeffding bound on $S$ gives us
@@ -167,7 +168,7 @@ We need to verify that the process of subdivision does not unduly increase the n
 of bins.
 
 \begin{lemma}
-After subdivision, $O(n)$ bins will exist.
+After subdivision, we will have $O(n)$ bins.
 \end{lemma}
 \begin{proof}
 Initially, there are $O(n)$ splitters with high probability by \lemref{number_of_flips}.
@@ -177,12 +178,31 @@ can create at most $N/k = n$ extra bins through subdivision.
 
 \subsection*{Finding splitters for large $k$}
 
-$k \geq \lg ^2 n$
+When $k$ is at least $\lg ^2 n$, we use an oversampling technique as used in 
+sample sort~\cite{BlellochLeMa91} to find a set of splitters and bound the 
+size of all bins.  In particular, we start by randomly sampling elements as 
+candidate splitters with probability $1/\lg k$.  Then, we merge these candidates
+using and a cache-oblivious $k$-merger~\cite{FrigoLePr99} using 
+$O((N/B\lg k) \log_{M/B} (k/B) + k) = O(N/B)$ memory transfers.  Finally, we take
+every $n$ evenly space elements from this sorted list as our set of splitters.
 
-In this section, we use sample sort (randomly select with probability $1/\lg k$ and
-then rake exactly $N/k$ evenly spaced samples) and $k$ is large enough that we don't have
-to subdivide the bins, yet still get $O(k)$-sized (actually, at most 
-$2(1+\epsilon)k$ elements) bins whp.  
+\begin{theorem}
+  Given an oversampling rate of $k/\lg k$, the largest resulting bin has at least 
+  $2(1+\epsilon)k$ elements with probability less than $N^{-\epsilon}$.
+\end{theorem}
+\begin{proof}
+  Let $R$ be the size of the largest bin.  
+  From Theorem B.3 of~\cite{BlellochLeMa91} and sufficiently large $N$, 
+  we have that $\prob{R > 2(1+\epsilon)k}$
+  \begin{align*}
+    &\leq N \exp \paren{ -(1+\epsilon)\paren{\frac{1+2\epsilon}{2(1+\epsilon)}}^2 \frac{k}{\lg k} }\\
+    &\leq N \exp \paren{-(1+\epsilon)\frac{k}{4\lg k}}\\
+    &\leq N \exp \paren{-(1+\epsilon)\frac{\lg^2 \frac{N}{\lg^2 n}}{4 \lg \lg ^2 n}}\\
+    &\leq N \exp \paren{-(1+\epsilon)\frac{\lg^2 N - 4 \lg N \lg \lg n + 4\lg ^2 \lg n }{8 \lg \lg n}}\\
+    &\leq N \exp \paren{-(1+\epsilon)\lg N}\\
+    &\leq N^{-\epsilon}\\
+  \end{align*}
+\end{proof}
 
 
 
