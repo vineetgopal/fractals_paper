@@ -2,7 +2,7 @@
 
 The \defn{predecessor} problem is to find the largest item in a given sorted list $L$
 that is not greater than a query value $q$.  The \defn{iterated predecessor query} 
-problem is to find the \defn{predecessor} for a query $q$ in each of a set of $k$ static lists
+problem is to find the predecessor for a query $q$ in each of a set of $k$ static lists
 $L_1 \ldots L_k$, each of size $n$.  A naive solution involves individual binary searches over all
 $k$ lists, which would require $O(k \lg n)$ time in the worst-case.  However, Chazelle
 and Guibas~\cite{ChazelleGu86a} showed that the lists can be 
@@ -13,8 +13,9 @@ In this project, we will demonstrate that the iterated predecessor query problem
 can be solved using a technique called \defn{range coalescing} in $O(\lg n + k)$ time.
 Range coalescing is \defn{cache-oblivious}~\cite{FrigoLePr99}, using only 
 $O(\log_{B+1} n + k/B)$ memory transfers to satisfy iterated predecessor
-queries.  Furthermore, range coalescing requires
-only linear space and the preprocessing takes linear time and $O(nk/B)$ memory
+queries.\footnote{Throughout this paper we will use the notation $\lg n$ to mean
+$\log_2 n$.}  Furthermore, range coalescing requires
+only linear space and the preprocessing takes linear time and $O(kn/B)$ memory
 transfers.
 
 Broad strokes of query with sweet graphic showing how the ranges are coalesced

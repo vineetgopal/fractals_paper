@@ -5,7 +5,7 @@ satisfied cache-obliviously using $O(\log_{B+1} n + k/B)$
 memory transfers using a \defn{range coalescing} data structure.  
 We also describe how a range coalescing data structure is built 
 cache-obliviously from a set of sorted lists $L_1 \ldots L_k$ each of size $n$ 
-using only $O(nk/B)$ memory transfers with high probability.  
+using only $O(kn/B)$ memory transfers with high probability.  
 
 %\subsection*{Structure}
 
@@ -21,7 +21,7 @@ exploit to implicitly denote the beginning of each subsequence.
 
 \begin{lemma}
 A range coalescing data structure $H$ built from a set of $k$ $n$-length
-sorted lists $L_1 \ldots L_k$ consumes $O(nk)$ space.
+sorted lists $L_1 \ldots L_k$ consumes $O(kn)$ space.
 \end{lemma}
 \begin{proof}
 The elements from all $k$ $n$-length lists $L_1 \ldots L_k$ are partitioned 
@@ -47,20 +47,20 @@ correspond to the predecessors of $q$ for each constituent list in $\{ L_1 \ldot
     \li $j \gets 1$
     \li \For $i \gets 1$ \To $\attrib{D}{\id{size}} - 1$ \Do
     \li   \If $D_i \leq q$ \Do
-    \li     $\id{output}_j \gets D_i$
+    \li     $Z_j \gets D_i$
           \End
     \li   \If $D_{i+1} < s$ \Do
     \li     $j \gets j + 1$
           \End
         \End
-    \li \Return $\id{output}$
+    \li \Return $Z$
   \end{codebox*}
 \caption{Pseudocode of the \proc{query} method for a range coalescing data
 structure $H$.  $H$ contains a sorted array $S$ of splitters organized using
 a van Emde Boas layout~\cite{BenderDeFa00}.  The function \proc{vEB} returns 
 a bin $D$, organized as an array, and a splitter $s$, which is the predecessor 
 of $q$ in $S$.  The bin $D$ is walked in a linear fashion, overwriting potential
-predecessors in the $\id{output}$ array and incrementing the output position whenever
+predecessors in the output array $Z$ and incrementing the output position whenever
 the subsequence of the next list begins.  The $j$th subsequence begins with the
 one and only element from $L_j$ that is smaller than the splitter $s$ and each
 bin is appended with $-\infty$ to handle the boundary condition when $D_{i+1}$ is

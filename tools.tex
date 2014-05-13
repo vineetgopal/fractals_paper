@@ -1,16 +1,37 @@
 \secput{cacheoblivious}{Cache-oblivious Tools}
 \subsection*{Array Scanning}
-Accessing a random element in an length $n$ array requires $O(1)$ memory transfers. However, if we access the entire array in order, we can achieve $O(n/B)$ memory transfers, where $B$ is the size of a block in cache. Each memory transfer brings $B$ elements into cache, so we must make at most $O(n/B)$ transfers.
+Accessing a random element in an length $n$ array requires $O(1)$ memory
+transfers. However, if we access the entire array in order, we can achieve
+$O(n/B)$ memory transfers, where $B$ is the size of a block in cache. Each
+memory transfer brings $B$ elements into cache, so we must make at most
+$O(n/B)$ transfers.
 
-\subsection*{vEB Layout}
-Traditional binary search on an array requires $O(\lg n)$ memory transfers. Every access to the array is a random access, and could be located in a different cache block. 
+\subsection*{vEB Layout} 
+Traditional binary search on an array requires $O(\lg n)$ 
+memory transfers. Every access to the array is a random access, and could
+be located in a different cache block.
 
-The vEB layout tries to optimize memory transfers by rearranging the array. It works be recursively dividing the tree into triangles, and storing each triangle contiguously in memory. This means that children and parent nodes are likely to be stored together in memory, reducing the number of memory transfers required. 
+The vEB layout tries to optimize memory transfers by rearranging the array. It
+works be recursively dividing the tree into triangles, and storing each
+triangle contiguously in memory. This means that children and parent nodes are
+likely to be stored together in memory, reducing the number of memory transfers
+required.
 
-\begin{lemma}
-A query on an binary tree in the vEB layout requires $O(\lg_B n)$ memory transfers. 
+\begin{lemma} 
+A query on an binary tree in the vEB layout requires $O(\log_{B+1} n)$
+memory transfers. 
 \end{lemma}
 
-\begin{proof}
-Triangles of size $M$ are recursively divided into smaller triangles of size $\sqrt{M}$. Lets examine the largest triangle that has less than $B$ elements. This triangle must have at least $\sqrt{B}$ elements, so its height must be at least $\frac{1}{2}\lg B$. This entire triangle can be loaded into one cache block. There are at most $\frac{\lg n}{\frac{1}{2}\lg B} = 2 \lg_B n$ of these triangles along a root to leaf path, so we only need to make $O(\lg_B n)$ memory transfers to find an element.
+\begin{proof} 
+Triangles of size $M$ are recursively divided into smaller
+triangles of size $\sqrt{M}$. Lets examine the largest triangle that has at most
+$B$ elements. This triangle must have at least $\sqrt{B+1}$ elements, so its
+height must be at least $\frac{1}{2}\lg \paren{B}$. This entire triangle can be loaded
+into one cache block. There are at most 
+$\frac{\lg n}{\frac{1}{2}\lg \paren{B+1}} = 2 \log_{B+1} n$ 
+of these triangles along a root to leaf path, so we only need to make
+$O(\log_{B+1} n)$ memory transfers to find an element. 
 \end{proof}
+
+
+

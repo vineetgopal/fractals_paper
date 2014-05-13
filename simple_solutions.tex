@@ -1,23 +1,44 @@
 \secput{simple}{Simple Solutions}
-We examine several simple solutions to the iterated predecessor problem. These solutions provide a good template for understanding range coalescing.
+We examine several simple solutions to the iterated predecessor problem. 
+These solutions provide a good template for understanding range coalescing.
 
 \subsection*{Sequential Binary Search}
-The simplest solution is to do a binary search on each of the k-lists, and write down the output. Since each binary search requires $O(\lg n)$ memory transfers, this solution requires a total of $O(k \lg n)$ memory transfers. The total space usage is optimal, $O(kn)$.
+The simplest solution is to do a binary search on each of the $k$ lists 
+$L_1 \ldots L_k$, and write 
+down the output. Since each binary search requires $O(\lg n)$ memory transfers, 
+this solution requires a total of $O(k \lg n)$ memory transfers. The total space 
+usage is optimal, $O(kn)$.
 
 \subsection*{Sequential vEB Binary Search}
-Using the vEB layout described previously, we can do binary searches using only $O(\lg_B n)$. If we use a vEB layout for each of the k-lists, we can perform the searches in $O(k \lg_B n)$. The total space usage is optimal, $O(kn)$.
+Using the vEB layout described previously, we can do binary searches using only 
+$O(\log_{B+1} n)$. If we use a vEB layout for each of the $k$ lists, we can perform 
+the searches in $O(k \log_{B+1} n)$. The total space usage is optimal, $O(kn)$.
 
 \subsection*{Fractional Cascading}
-Fractional cascading is the accepted solution for the in-memory iterated predecessor problem. It achieves a runtime of $O(\lg n + k)$ in memory.
+Fractional cascading is the incumbent solution for the in-memory iterated 
+predecessor problem. It achieves a runtime of $O(\lg n + k)$.
 
-The main idea behind fractional cascading is to use the information learned from a binary search on the first list to do each of the $k-1$ remaining searches in constant time. To do this, we store pointers in each list to its predecessor and successor in the next list. This gives us a smaller range to search through in the next list.
+The main idea behind fractional cascading is to use the information learned from 
+a binary search on the first list to do each of the $k-1$ remaining searches in 
+constant time. To do this, we store pointers in each list to its predecessor and 
+successor in the next list. This gives us a smaller range to search through in the next list.
 
-If we did this naively, this would not give us any benefits. The predecessor and successor could span the entire list. However, by altering the lists slightly, we can achieve constant time per remaining search. Starting with the last list, we insert every other element into the previous list. We do this for each list. This ensures that the range between predecessor and successor is at most a constant value.
+If we did this naively, this would not give us any benefits. The predecessor and 
+successor could span the entire list. However, by altering the lists slightly, 
+we can achieve constant time per remaining search. Starting with the last list, 
+we insert every other element into the previous list. We do this for each list. 
+This ensures that the range between predecessor and successor is at most a constant value.
 
-We store the initial list in the vEB layout to minimize memory transfers for the initial binary searches. Using this method, we can perform a query using $O(\lg_B n + k)$ memory transfers. The total space usage is optimal, $O(kn)$.
+We store the initial list in the vEB layout to minimize memory transfers for the 
+initial binary searches. Using this method, we can perform a query using 
+$O(\log_{B+1} n + k)$ memory transfers. The total space usage is optimal, $O(kn)$.
 
 \subsection*{Quadratic Storage}
-We store one sorted $nk$ list using the vEB layout. Each element in the list has a pointer to its $k$ predecessors, one from each list (including its own). We can iterate over this contiguous list using $O(k/B)$ memory transfers, so the total number of memory transfers is $O(\lg nk + k/B)$. However, the total space usage is $O(nk^2)$, since we must store a $k$-length array for each element.
+We store one sorted $kn$-length list using the vEB layout. Each element in the list has 
+a pointer to its $k$ predecessors, one from each list (including its own). 
+We can iterate over this contiguous list using $O(k/B)$ memory transfers, 
+so the total number of memory transfers is $O(\lg \paren{kn} + k/B)$. However, the
+total space usage is $O(nk^2)$, since we must store a $k$-length array for each element.
 
 
 
