@@ -17,6 +17,15 @@ triangle contiguously in memory. This means that children and parent nodes are
 likely to be stored together in memory, reducing the number of memory transfers
 required.
 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=.35]{veb.pdf}
+\end{center}
+\caption{vEB trees are recursively divided into triangles of size $\sqrt{N}$. Each of these
+triangles is stores contiguously in memory.}
+\label{fig:veb} 
+\end{figure}
+
 \begin{lemma} 
 A query on an binary tree in the vEB layout requires $O(\log_{B+1} n)$
 memory transfers. 
