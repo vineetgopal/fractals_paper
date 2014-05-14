@@ -21,7 +21,7 @@ Fractional cascading~\cite{ChazelleGu86a} is the incumbent solution for the in-m
 predecessor query problem. An external memory-oriented extension of fractional cascading
 described below achieves a runtime of $O(\log_{B+1} n + k)$.
 
-The main idea behind fractional cascading is to use the result from 
+The main idea behind fractional cascading is to use the query result from 
 each list to perform a search on the next list in 
 constant time.  One needs only to do a binary search on the first list to prime the
 pipeline.  To do this, we store pointers in each list to its predecessor and 
