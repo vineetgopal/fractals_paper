@@ -93,9 +93,11 @@ which partition all of the elements into bins, each of which stores the answers 
 query which falls in the range of values between the associated splitter and the
 splitter for the next bin of larger value.
 When $k$ is less than $\ln^2 n$, we can randomly select elements to be splitters
-with probability $1/k$ and subdivide bins that are too large, potentially generating
-extra splitters, while generating $O(kn/B)$ memory transfers with high
-probability.\footnote{In this context, 
+with probability $1/k$ using $O(kn/B)$ memory transfers by streaming the lists and
+writing out the samples to separate lists.  Next, 
+we subdivide bins that are too large, potentially generating
+extra splitters.  We will show that this process generates $O(kn/B)$ memory 
+transfers with high probability.\footnote{In this context, 
 \defn{with high probability} means with probability greater
 than $1-N^{-c}$ where $N$ is the total number of elements in the problem and $c > 1$
 is some constant.} First, we establish two straightforward yet useful lemmas.
@@ -185,8 +187,9 @@ can create at most $n$ extra bins through subdivision.
 When $k$ is at least $\ln ^2 n$, we use an oversampling technique as used in 
 sample sort~\cite{BlellochLeMa91} to find a set of splitters and bound the 
 size of all bins.  In particular, we start by randomly sampling elements as 
-candidate splitters with probability $1/\ln k$.  Then, we merge these candidates
-using and a cache-oblivious $k$-merger~\cite{FrigoLePr99} using 
+candidate splitters with probability $1/\ln k$, which can be accomplished by streaming
+each list and writing out the samples to a separate candidate list with $O(kn/B)$ memory transfers.  
+Then, we merge these candidates using and a cache-oblivious $k$-merger~\cite{FrigoLePr99} using 
 $O((kn/B\ln k) \log_{M/B} (k/B) + k) = O(kn/B)$ memory transfers, assuming $M=\Omega \paren{B}$
 and $n=\Omega \paren{B}$.  Finally, we take
 every $n$ evenly space elements from this sorted list as our set of splitters.
