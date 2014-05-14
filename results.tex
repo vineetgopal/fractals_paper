@@ -1,25 +1,37 @@
 \secput{results}{Implementation and Experimentation}
 We implemented each of the simple solutions described in 
-\secref{simple}, and compared their performance to range coalescing on a variety of data sets. 
+\secref{simple}, and compared their performance to range coalescing on a variety 
+of data sets. 
 
-Each solution was implemented in C++, and compiled and tested on an Intel i7 processor with 3MB of L3 cache. We implemented the full merge range coalescing solution, instead of the randomized solution. Before each test, $k$ lists each of length $n$ were generated using a uniform distribution from 0 to 1 million. These lists were passed in as input to each of the solutions.  The initialization times and average query times of each solution were recorded. 
+Each solution was implemented in C++, and compiled and tested on an Intel i7 
+processor with 3MB of L3 cache. We implemented the full merge range coalescing 
+solution described in \secref{preprocessing}, 
+instead of the randomized solution. Before each test, $k$ lists each of 
+length $n$ were generated using a uniform distribution of integers from 0 to 1 million. 
+These lists were passed in as input to each of the solutions.  The initialization 
+times and average query times of each solution were recorded. 
 
 Range coalescing performed significantly better in practice than other 
-linear-storage solutions. It performed better on both small and large datasets. Average query times are shown in \figref{results-k} and \figref{results-n}.
+linear-storage solutions. It performed better on both small and large datasets. 
+Average query times are shown in \figref{results-k} and \figref{results-n}.
 As the datasets got larger, the effects of range coalescing became more evident. 
 For $n=50$ and $k=1000$, range coalescing did 5 times better than a simple binary search,
 whereas for $n=5000$ and $k=1000$, range coalescing performed 18 times better.
 
-However, range coalescing requires much more time for initialization. 
-It takes about 20 times longer than initialize than the vEB search, and 3 times longer
-than fractional cascading. We believe these results could be improved upon - we did not implement the linear time initialization method described here, but we leave that as future work.
+However, range coalescing requires much more time for preprocessing. 
+It takes about 20 times longer to initialize than the vEB search, and 3 times longer
+than fractional cascading. We believe these results could be improved upon - we 
+did not implement the linear time randomized preprocessing method described in
+\secref{preprocessing}, leaving it instead to future work.
 
-The average query time for the quadratic storage solution was better than all 
-linear storage solutions. However, it required $O(nk^2)$ time to initialize. For $k=1000,n=100$, this took 42 times longer than range coalescing to initialize.
+The average query time for the quadratic storage solution is better than all 
+linear storage solutions. However, it requires $O(nk^2)$ time to initialize. 
+For $k=1000,n=100$, this is 42 times longer than the preprocessing for the 
+range coalescing solution.
 
 
 \begin{figure}
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=.9]
 \begin{axis}[
     %title={},
     xlabel={$k$},
@@ -51,7 +63,7 @@ linear storage solutions. However, it required $O(nk^2)$ time to initialize. For
 \end{figure}
 
 \begin{figure}
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=.9]
 \begin{axis}[
     %title={},
     xlabel={$n$},

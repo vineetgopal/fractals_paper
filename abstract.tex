@@ -1,2 +1,9 @@
 \subsection*{Abstract}
-This is the abstract... everything is in two columns... I tried to follow the structure of Demaine's previous papers.
+In this paper we develop an optimal cache-oblivious data structure that solves the
+iterated predecessor problem. Given $k$ static sorted $n$-length lists $L_1 \ldots L_k$
+and a query value $q$, the \defn{iterated predecessor} problem is to the largest
+element in each list which is not greater than $q$.  Our solution to this problem
+is called range coalescing and requires at most $O(\log_{B+1} n + k/B)$ memory
+transfers on processor with a cache of $M = \Omega \paren{B}$ blocks of size $B$.
+Range coalescing consumes $O(kn)$ space and requires only $O(kn/B)$ memory transfers
+to construct with high probability.
