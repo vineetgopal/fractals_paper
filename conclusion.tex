@@ -1,1 +1,13 @@
-\secput{conclusion}{Conclusion}
+\secput{conclusion}{Future Work}
+We have presented an optimal cache oblivious solution for the static 
+iterated predecessor query. There are several areas in which this can be extended. 
+Range coalescing does not currently support dynamic operations like insert or delete.
+It becomes very difficult to maintain the size of the bins without a large overhead.
+
+Range coalescing specifically solves the iterated predecessor problem on $k$ lists, but this does 
+not generalize easily to a graph of lists. Fractional cascading achieves an running time of
+$O(\lg n + k)$ on a graph query, where $k$ is the length of the traversed path in the graph. 
+Applying range coalescing directly to this problem result sin $O(\log_{B+1} n + K)$, 
+where $K$ is the total size of the graph. The concepts of range coalescing could 
+hopefully be developed to be used as a blackbox for such problems.
+
