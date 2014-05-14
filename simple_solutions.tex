@@ -1,11 +1,13 @@
 \secput{simple}{Known Solutions}
 We examine several simple solutions to the iterated predecessor problem. 
-These solutions provide a good template for understanding range coalescing.
+These solutions provide a good background for understanding range coalescing and
+serve as our implementation baselines in \secref{results}.
 
 \subsection*{Sequential Binary Search}
-The simplest solution is to do a binary search on each of the $k$ unmodified lists 
+The simplest solution to the iterative predecessor query problem 
+is to do a binary search on each of the $k$ unmodified lists 
 $L_1 \ldots L_k$, and write 
-down the output. Since each binary search requires $O(\lg \paren{n/B})$ memory transfers, 
+down the output from each. Since each binary search requires $O(\lg \paren{n/B})$ memory transfers, 
 this solution requires a total of $O(k \lg \paren{n/B})$ memory transfers. The total space 
 usage is optimal, $O(kn)$.
 
@@ -15,13 +17,14 @@ $O(\log_{B+1} n)$. If we use a vEB layout for each of the $k$ lists, we can perf
 the searches in $O(k \log_{B+1} n)$. The total space usage is optimal, $O(kn)$.
 
 \subsection*{Fractional Cascading}
-Fractional cascading is the incumbent solution for the in-memory iterated 
-predecessor problem. An external memory oriented extension of fractional cascading
+Fractional cascading~\cite{ChazelleGu86} is the incumbent solution for the in-memory iterated 
+predecessor query problem. An external memory oriented extension of fractional cascading
 described below achieves a runtime of $O(\log_{B+1} n + k)$.
 
-The main idea behind fractional cascading is to use the information learned from 
-a binary search on the first list to perform each of the $k-1$ remaining searches in 
-constant time. To do this, we store pointers in each list to its predecessor and 
+The main idea behind fractional cascading is to use the result from 
+each list to perform a search on the next list in 
+constant time.  One needs only to do a binary search on the first list to prime the
+pipeline.  To do this, we store pointers in each list to its predecessor and 
 successor in the next list. This gives us a constant-sized range to 
 search through in the next list.
 
@@ -37,11 +40,13 @@ initial binary searches. Using this method, we can perform a query using
 $O(\log_{B+1} n + k)$ memory transfers. The total space usage is optimal, $O(kn)$.
 
 \subsection*{Quadratic Storage}
-Suppose we store one sorted $kn$-length list using the vEB layout. Each element in the list has 
-a copy of its $k$ predecessors, one from each list in $\{ L_1 \ldots L_k \}$. 
-We can iterate over this contiguous list using $O(k/B)$ memory transfers, 
+A brute-force fast solution involves storing one sorted $kn$-length list 
+of all elements from all lists using the vEB layout. Accompanying each element in the list is 
+a $k$-length sublist with a copy of its $k$ predecessors, 
+one from each list in $\{ L_1 \ldots L_k \}$. 
+We can iterate over this contiguous sublist using $O(k/B)$ memory transfers, 
 so the total number of memory transfers is $O(\log_{B+1} \paren{kn} + k/B)$. However, the
-total space usage is $O(nk^2)$, since we must store a $k$-length array for each element.
+total space usage is $O(nk^2)$, since we must store a $k$-length sublist for each element.
 
 
 
