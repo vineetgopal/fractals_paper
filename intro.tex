@@ -15,7 +15,7 @@ Range coalescing is \defn{cache-oblivious}~\cite{FrigoLePr99}, using only
 $O(\log_{B+1} n + k/B)$ memory transfers per query in the worst case.\footnote{Throughout 
 this paper we will use the notation $\lg n$ to mean $\log_2 n$ and $\ln n$ to 
 mean the natural logarithm.}  Furthermore, range coalescing requires
-only linear space and the preprocessing takes linear time and $O(kn/B)$ memory
+only linear space and the preprocessing requires $O(kn)$ time and $O(kn/B)$ memory
 transfers.
 
 The essence of range coalescing, as the name suggests, is to coalesce ranges of 
@@ -66,7 +66,8 @@ subsequence from $L_k$.}
 \label{fig:coalesced_bin} 
 \end{figure}
 
-Throughout this paper we will let $M$ be the number of cache blocks of size $B$
+Throughout this paper we will let $M$ be the size of the cache and $B$ be the size
+of the cache blocks
 on a hypothetical external memory machine.  We will consider solutions to the iterated
 predecessor problem, in which we are given $k$ $n$-length lists $L_1 \ldots L_k$ and
 we preprocess them to improve the query time.
@@ -78,7 +79,7 @@ which are not cache-oblivious, but nonetheless serve as a reasonable baseline fo
 our work.  We present range coalescing in \secref{solution} and show that they
 answer queries cache-obliviously using $O(\log_{B+1} n + k/B)$ memory transfers.
 \secref{preprocessing} demonstrates that the preprocessing for a range coalescing
-data structure requires only $O(nk/B)$ with high probability.  \secref{results} 
+data structure requires only $O(kn/B)$ with high probability.  \secref{results} 
 describes our implementations of each solution described herein and an experimental
 methodology for testing the performance of each.  Finally, \secref{conclusion} 
 describes some limitations of range coalescing, providing opportunities for future

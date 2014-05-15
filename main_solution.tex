@@ -27,7 +27,7 @@ sorted lists $L_1 \ldots L_k$ consumes $O(kn)$ space.
 The elements from all $n$-length lists $L_1 \ldots L_k$ are partitioned 
 into $n$ bins.  In addition, each bin has exactly one element for each of 
 the $k$ lists which is smaller in value than the splitter for the bin.  Thus, each
-of the $n$ bins has $O(k)$ elements and the data structure has $O(nk)$ space.
+of the $n$ bins has $O(k)$ elements and the data structure has $O(kn)$ space.
 \end{proof}
 
 
@@ -97,8 +97,8 @@ through the pseudocode in \figref{query}.
 \begin{theorem}
 An iterated predecessor query \proc{query}$(H,q)$ on a range coalescing data 
 structure $H$ built from a set of $n$-length sorted lists $L_1 \ldots L_k$ 
-incurs $O(\log_{B+1} n + k/B)$ memory transfers on a processor with a cache 
-size of $M = \Omega(B)$ blocks.
+incurs $O(\log_{B+1} n + k/B)$ memory transfers on a processor with cache blocks
+of size $B$.
 \end{theorem}
 \begin{proof}
 We use the cache-oblivious search tree structure described by Bender, 

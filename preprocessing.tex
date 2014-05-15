@@ -61,7 +61,7 @@ written, respectively.}
 Given a sorted list of $O(n)$ splitters $S$ and $k$ sorted $n$-length lists 
 $L_1 \ldots L_k$, the bins for a range coalescing data structure can be constructed
 deterministically and cache-obliviously using $O(kn/B)$ memory transfers on a 
-processor with a cache of $M=\Omega \paren{B}$ blocks.
+processor with a cache of size $M=\Omega \paren{B^2}$ and cache blocks of size $B$.
 \end{theorem}
 
 \begin{proof}
@@ -78,9 +78,9 @@ in the list as the list is streamed linearly to transfer the elements to various
 For the head of each list, there can be as many as
 two non-full memory tranfers (ie. not all of the elements on the cache block were
 written or read).  Consider the largest $r$ for which these $2 \cdot 2^r$ list heads
-fit in cache, so that $a2^r = M$ for some constant $a$.  In total, there will be 
-$kn/2^{2r}$ cache flushes for a total of $M \cdot kna^2/M^2 = O(kn/B)$ cache blocks, 
-assuming $M = \Omega(B)$.  There may also be additional full memory transfers in the
+fit in cache, so that $a2^r B = M$ for some constant $a$.  In total, there will be 
+$kn/2^{2r}$ cache flushes for a total of $(M/B) \cdot kn(aB/M)^2 = O(kn/B)$ cache blocks, 
+assuming $M = \Omega(B^2)$.  There may also be additional full memory transfers in the
 course of processing each $2^r$ by $2^r$ region, though
 each element may appear in at most one full memory transfer, thus there are at most
 $kn/B$ full memory transfers.  
@@ -158,8 +158,7 @@ elements, since processing a bin incurs at least one memory reference.}
   for all $i$ since the largest bin is assumed to have at most 
   $(1+\epsilon)k\ln \paren{kn}$ elements.  
   Let $t = \paren{k/2B}(1+\epsilon) \ln ^2 \paren{kn}$ and note that 
-  each random variable in $\{ x_1 \ldots x_m \}$ has support
-  in the range $[0, t]$.
+  each random variable in $\{ x_1 \ldots x_m \}$ has support in the range $[0, t]$.
   A Hoeffding bound on $S$ gives us $\prob{S - E[S] \geq t \sqrt{\epsilon m \ln \paren{kn}}}$
   \begin{align*}
     %\prob{S - E[S] \geq E[S]} & \leq \exp \paren{ -\frac{2\paren{ am\frac{k}{B}}^2}{m\paren{\frac{k}{2B}\paren{1+\epsilon}^2\lg^2 N}^2}}\\
@@ -170,8 +169,8 @@ elements, since processing a bin incurs at least one memory reference.}
   Then, for sufficiently large $kn$, $S = O(kn/B)$ with high probability.
 \end{proof}
 
-We need to verify that the process of subdivision does not unduly increase the number
-of bins.
+We need to verify that the process of subdivision does not unduly increase the 
+number of bins.
 
 \begin{lemma}
 After subdivision, we will have $O(n)$ bins.
@@ -188,20 +187,20 @@ When $k$ is at least $\ln ^2 n$, we use an oversampling technique as used in
 sample sort~\cite{BlellochLeMa91} to find a set of splitters and bound the 
 size of all bins.  In particular, we start by randomly sampling elements as 
 candidate splitters with probability $1/\ln k$, which can be accomplished by streaming
-each list and writing out the samples to a separate candidate list with $O(kn/B)$ memory transfers.  
-Then, we merge these candidates using and a cache-oblivious $k$-merger~\cite{FrigoLePr99} using 
-$O((kn/B\ln k) \log_{M/B} (k/B) + k) = O(kn/B)$ memory transfers, assuming $M=\Omega \paren{B}$
-and $n=\Omega \paren{B}$.  Finally, we take
-every $n$ evenly space elements from this sorted list as our set of splitters.
+each list and writing out the samples to a separate candidate list with 
+$O(kn/B)$ memory transfers.  Then, we merge these candidates using and a 
+cache-oblivious $k$-merger~\cite{FrigoLePr99} using 
+$O((kn/B\ln k) \log_{M/B} (k/B) + k) = O(kn/B)$ memory transfers, assuming 
+$M=\Omega \paren{B^2}$ and $n=\Omega \paren{B}$.  Finally, we take every 
+$n$ evenly space elements from this sorted list as our set of splitters.
 
 \begin{theorem}
   Given an oversampling rate of $k/\ln k$, the largest resulting bin has at least 
   $2(1+\epsilon)k$ elements with probability less than $\paren{kn}^{-\epsilon}$.
 \end{theorem}
 \begin{proof}
-  Let $R$ be the size of the largest bin.  
-  From Theorem B.3 of~\cite{BlellochLeMa91} and for sufficiently large $kn$, 
-  we have that $\prob{R > 2(1+\epsilon)k}$
+  Let $R$ be the size of the largest bin.  From Theorem B.3 of~\cite{BlellochLeMa91} 
+  and for sufficiently large $kn$, we have that $\prob{R > 2(1+\epsilon)k}$
   \begin{align*}
     &\leq kn \exp \paren{ -(1+\epsilon)\paren{\frac{1+2\epsilon}{2(1+\epsilon)}}^2 \frac{k}{\ln k} }\\
     &\leq kn \exp \paren{-(1+\epsilon)\frac{k}{4\ln k}}\\
